@@ -18,10 +18,10 @@ values = {
 prices = {
     "corn seeds": 5,
     "wheat seeds": 5,
-    "poor fishing rod": 10,
+    "poor fishing rod": 0,
     "good fishing rod": 20,
     "great fishing rod": 40,
-    "stone pickaxe": 10,
+    "stone pickaxe": 0,
     "iron pickaxe": 20,
     "diamond pickaxe": 40
 }
@@ -127,6 +127,7 @@ class PlayerData:
             am = "PM"
         return f"{hour} o'clock {am}"
 
+    # Farming functions
     def harvest(self):
         if self.farm.crop_progress >= self.farm.crop_ready:
             self.farm.reset_crop_progress()
@@ -156,6 +157,7 @@ class PlayerData:
         elif "diamond pickaxe" in self.inventory:
             self.inventory["perfect gem"] += 1
 
+    # Merchant functions
     def sell(self, item: str = "", quantity: int = 0) -> bool:
         if self.inventory[item] >= quantity:
             self.inventory[item] -= quantity
@@ -175,6 +177,9 @@ class PlayerData:
             self.inventory[item] += quantity
             return True
         return False
+
+    def find(self, item: str = "", quantity: int = 0):
+        self.inventory[item] += quantity
 
     def alien_getter(self, alien: str = "") -> int:
         return self.alien_friendship.get(alien, 0)

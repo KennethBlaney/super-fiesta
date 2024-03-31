@@ -1,5 +1,6 @@
 ﻿define pc = Character("[player_name]")
 define lawyer = Character("Lawyer")
+define sal = Character("Sal the Fisher")
 
 label start:
     $ config.rollback_enabled = False
@@ -7,6 +8,9 @@ label start:
     $ pd = PlayerData()
     $ ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
     town_first_time = True
+    fish_store_first_time = True
+    plant_store_first_time = True
+    gem_store_first_time = True
 
     lawyer "Ah welcome, please sit."
     $ player_name = renpy.input("I'm glad you could make it Mr... oh, I'm sorry, how would you like to be addressed.")
@@ -18,10 +22,10 @@ label start:
     lawyer "There is also a decent sized garden near the main house. Perfect for a hobbyist who wants to make some money."
     lawyer "The nearby town is full of decent folk and will often have swap meets to buy and sell things."
     lawyer "Unfortunately, [player_name] part of the stipulation in the will, requires that you must live at the property for one year before you may sell."
-    lawyer "A strange provision for sure, but I've seen stranger."
-    lawyer "Finally, the really strange part. My client instructed me to inform you that he believed this location was the meeting place for several forms of extraterrestrial life."
+    lawyer "A strange provision for sure, but I've seen stranger. For example..."
+    lawyer "My client instructed me to inform you that he believed this location was the meeting place for several forms of extraterrestrial life."
     lawyer "I can't say I fully believe that myself, but I am bound by contract to inform you. You may do with that information as you please."
-    lawyer "If you have any questions, please feel free to contact me. I'm only a phone call away."
+    lawyer "And with that [player_name], I will leave you to your new home."
 
     "One long car ride later..."
     pc "Well, I guess here it is."
@@ -120,6 +124,7 @@ label gardening:
 label in_town:
     if town_first_time:
         call town_tour
+        town_first_time = False
     while True:
         pc "This is a nice town."
         menu:
@@ -138,16 +143,60 @@ label in_town:
                 return
 
 label town_tour:
-    "Yep... tour of the town."
+    pc "The town is a bit of a drive away. Definitely not something I'll be making more than once per day."
+    pc "But the lawyer was right, this is a pretty nice little town. I'll take a walk around and see the sights."
+    pc "First up is Sal's Bait and Tackle. Looks like a fishing supply store. Probably a good place to get a pole so I can go fishing in my stream."
+    pc "Next up is Flora's Nursery. Everything I might need to get my garden up and running."
+    pc "Finally the Gem and Mineral museum. I guess this town has a history of mining. The current curator appears to be named Sapphire."
+    pc "Well, I guess these are my neighbors for the next year."
+    return
 
 label fishing_store:
-    "Smells like fish"
+    if fish_store_first_time:
+        "Smells like fish in here."
+        "Which I guess is to be expected."
+        sal "Heya! A new face in town. Welcome to the store. What can I help you with?"
+        pc "Hi. Nice to meet you. I just inherited a cottage just outside of town..."
+        sal "Oh, I know that place. I'm guessing you are coming in here for some gear to fish that nice stream on your land."
+        pc "Yes. That's exactly right."
+        sal "Well, I always like to encourage the hobby, so here's a little starter kit for you."
+        "Obtained 'poor fishing rod'"
+        $pd.find('poor fishing rod', 1)
+        pc "Oh, thank you, but you don't have to..."
+        sal "I insist. And if you catch anything please come back and show me. I have a connection to a restaurant one town over that I routinely sell my catch to. I'd be happy to sell yours also."
+        sal "Also I have some much better gear available for sale. So check that out when you are interested in getting further into the hobby."
+    while True:
+        menu:
+            sal "Welcome, what can I do for you."
+
+            "sell fish":
+                "done"
+
+            "buy 'good fishing rod'" if 'good fishing rod' not in pd.inventory:
+                $success = pd.buy('good fishing rod', 1)
+                if success:
+                    sal "Sold. Glad to see you are getting into the hobby."
+                else:
+                    sal "Sorry [player_name]. I don't think you have enough money. Try catching some fish in your stream and selling them to me."
+
+            "buy 'great fishing rod'" if 'great fishing rod' not in pd.inventory:
+                $success = pd.buy('great fishing rod', 1)
+                if success:
+                    sal "Sold. You are quite the master baiter now..."
+                    sal "What? Did I say something funny?"
+                else:
+                    "Sorry [player_name]. I don't think you have enough money. Try catching some fish in your stream and selling them to me."
+            "That's all for now.":
+                return
+
 
 label florist:
-    "Smells nice"
+    if plant_store_first_time:
+        "Smells nice"
 
 label gem_store:
-    "Smells like rock?"
+    if gem_store_first_time:
+        "Smells like rock?"
 
 label one_year_later:
     pc "Bye farm"
