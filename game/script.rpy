@@ -6,6 +6,7 @@ label start:
     $ from utils import PlayerData
     $ pd = PlayerData()
     $ ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
+    town_first_time = True
 
     lawyer "Ah welcome, please sit."
     $ player_name = renpy.input("I'm glad you could make it Mr... oh, I'm sorry, how would you like to be addressed.")
@@ -97,6 +98,7 @@ label daily_routine:
 
 label gone_to_town:
     pc "I drive into town and talk to the locals"
+    call in_town
     $pd.return_from_town()
     jump sleep_time
 
@@ -114,6 +116,38 @@ label gardening:
     pc "Nice day to garden"
     $pd.farm.set_worked("gardening")
     return
+
+label in_town:
+    if town_first_time:
+        call town_tour
+    while True:
+        pc "This is a nice town."
+        menu:
+            "What do I need to do while here?"
+
+            "Stop by the bait and tackle store.":
+                call fishing_store
+
+            "Go to the florist.":
+                call florist
+
+            "Visit the gem and mineral museum":
+                call gem_store
+
+            "Nothing else. Time to head home":
+                return
+
+label town_tour:
+    "Yep... tour of the town."
+
+label fishing_store:
+    "Smells like fish"
+
+label florist:
+    "Smells nice"
+
+label gem_store:
+    "Smells like rock?"
 
 label one_year_later:
     pc "Bye farm"
