@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-
 values = {
     "corn": 10,
     "wheat": 10,
@@ -53,6 +52,12 @@ class Farm:
             self.crop_progress += 1
             self.worked_today["gardening"] = True
 
+    def get_worked(self, activity: str = ""):
+        return self.worked_today.get(activity, False)
+
+    def set_worked(self, activity: str = ""):
+        self.worked_today[activity] = True
+
     def reset_crop_progress(self):
         self.crop_progress = 0
         self.crop_planted = ""
@@ -70,7 +75,8 @@ class Farm:
 class PlayerData:
     inventory = defaultdict(lambda: 0)
     well_rested: bool = True
-    time_of_day = datetime(1, 1, 1, 0, 0, 0)
+    in_town: bool = False
+    time_of_day = datetime(2024, 5, 1, 8, 0, 0)
     cash = 0
     farm = Farm()
 
@@ -79,20 +85,47 @@ class PlayerData:
         "lizard": 0,
         "nordic": 0,
         "insect": 0
-        }
+    }
 
     # Time functions
     def advance_time(self):
         if self.well_rested:
-            self.time_of_day += timedelta(hours=3)
-        else:
             self.time_of_day += timedelta(hours=4)
+        else:
+            self.time_of_day += timedelta(hours=6)
+
+    def sleep_for_the_night(self):
+        self.time_of_day = datetime(self.time_of_day.year,
+                                    self.time_of_day.month,
+                                    self.time_of_day.day + 1,
+                                    8,
+                                    0,
+                                    0)
+        self.farm.reset_worked()
+        self.in_town = False
+
+    def return_from_town(self):
+        self.time_of_day = datetime(self.time_of_day.year,
+                                    self.time_of_day.month,
+                                    self.time_of_day.day,
+                                    10,
+                                    0,
+                                    0)
+        self.in_town = False
 
     def get_day_of_week(self):
         return self.time_of_day.strftime('%A')
 
     def get_month_of_year(self):
         return self.time_of_day.strftime('%B')
+
+    def get_oclock(self):
+        am = "AM"
+        hour = self.time_of_day.hour
+        if hour > 12:
+            hour -= 12
+            am = "PM"
+        return f"{hour} o'clock {am}"
 
     def harvest(self):
         if self.farm.crop_progress >= self.farm.crop_ready:
