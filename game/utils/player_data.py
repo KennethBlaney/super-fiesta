@@ -136,27 +136,34 @@ class PlayerData:
 
     def go_fishing(self):
         if self.farm.worked_today["fishing"]:
-            return
+            return 0
         else:
             self.farm.worked_today["fishing"] = True
         if "great fishing rod" in self.inventory:
             self.inventory["big fish"] += 1
+            return 3
         elif "good fishing rod" in self.inventory:
             self.inventory["medium fish"] += 1
+            return 2
         elif "poor fishing rod" in self.inventory:
             self.inventory["small fish"] += 1
+            return 1
 
     def mining(self):
         if self.farm.worked_today["mining"]:
-            return
+            return 0
         else:
             self.farm.worked_today["mining"] = True
-        if "stone pickaxe" in self.inventory:
-            self.inventory["plain gem"] += 1
+        if "diamond pickaxe" in self.inventory:
+            self.inventory["perfect gem"] += 1
+            return 3
         elif "iron pickaxe" in self.inventory:
             self.inventory["nice gem"] += 1
-        elif "diamond pickaxe" in self.inventory:
-            self.inventory["perfect gem"] += 1
+            return 2
+        elif "stone pickaxe" in self.inventory:
+            self.inventory["plain gem"] += 1
+            return 1
+
 
     # Merchant functions
     def sell(self, item: str = "", quantity: int = 0) -> bool:
@@ -193,9 +200,9 @@ class PlayerData:
         self.inventory = inventory
 
     # alien romance
-    def alien_getter(self, alien: str = "") -> int:
+    def alien_getter(self, alien: str = "grey") -> int:
         return self.alien_friendship.get(alien, 0)
 
-    def alien_incr(self, alien: str = ""):
+    def alien_incr(self, alien: str = "grey"):
         if alien in self.alien_friendship:
             self.alien_friendship[alien] += 1

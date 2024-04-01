@@ -12,7 +12,7 @@
 ##
 ## The _() surrounding the string marks it as eligible for translation.
 
-define config.name = _("temp_name")
+define config.name = _("Abduct Me Alien Daddy")
 
 
 ## Determines if the title given above is shown on the main menu screen. Set
@@ -37,7 +37,7 @@ define gui.about = _p("""
 ## distribution. This must be ASCII-only, and must not contain spaces, colons,
 ## or semicolons.
 
-define build.name = "temp_name"
+define build.name = "abduct_me_alien_daddy"
 
 
 ## Sounds and music ############################################################
