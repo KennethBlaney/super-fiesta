@@ -5,7 +5,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 values = {
-    "corn": 10,
     "wheat": 10,
     "small fish": 5,
     "medium fish": 10,
@@ -16,7 +15,6 @@ values = {
 }
 
 prices = {
-    "corn seeds": 5,
     "wheat seeds": 5,
     "poor fishing rod": 0,
     "good fishing rod": 20,
@@ -34,7 +32,7 @@ crop_time = {
 
 @dataclass
 class Farm:
-    crop_level = defaultdict(lambda: 0)
+    crop_level = defaultdict(lambda: 1)
     crop_progress = 0
     crop_planted = ""
     crop_ready = math.inf
@@ -103,6 +101,7 @@ class PlayerData:
                                     0)
         self.farm.reset_worked()
         self.in_town = False
+        self.inventory_cleaner()
 
     def return_from_town(self):
         self.time_of_day = datetime(self.time_of_day.year,
@@ -181,6 +180,17 @@ class PlayerData:
     def find(self, item: str = "", quantity: int = 0):
         self.inventory[item] += quantity
 
+    def inventory_getter(self, item: str = ""):
+        return self.inventory.get(item, 0)
+
+    def inventory_cleaner(self):
+        inventory = self.inventory
+        for key in self.inventory:
+            if self.inventory[key] == 0:
+                del inventory[key]
+        self.inventory = inventory
+
+    # alien romance
     def alien_getter(self, alien: str = "") -> int:
         return self.alien_friendship.get(alien, 0)
 
