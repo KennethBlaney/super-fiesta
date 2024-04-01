@@ -5,7 +5,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 values = {
-    "corn": 10,
     "wheat": 10,
     "small fish": 5,
     "medium fish": 10,
@@ -16,39 +15,36 @@ values = {
 }
 
 prices = {
-    "corn seeds": 5,
     "wheat seeds": 5,
-    "poor fishing rod": 10,
+    "poor fishing rod": 0,
     "good fishing rod": 20,
     "great fishing rod": 40,
-    "stone pickaxe": 10,
+    "stone pickaxe": 0,
     "iron pickaxe": 20,
     "diamond pickaxe": 40
 }
 
-crop_time = {
-    "wheat": 3,
-    "corn": 3
-}
+crop_time = 3
 
 
 @dataclass
 class Farm:
-    crop_level = defaultdict(lambda: 0)
+    crop_level = defaultdict(lambda: 1)
     crop_progress = 0
-    crop_planted = ""
+    crop_planted = False
     crop_ready = math.inf
+    garden_weeds = True
     worked_today = {
         "gardening": False,
         "fishing": False,
         "mining": False
     }
 
-    def work(self, crop: str = ""):
+    def work(self):
         if not self.worked_today["gardening"]:
             if not self.crop_planted:
-                self.crop_planted = crop
-                self.crop_ready = crop_time[crop]
+                self.crop_planted = True
+                self.crop_ready = crop_time
             self.crop_progress += 1
             self.worked_today["gardening"] = True
 
@@ -60,7 +56,7 @@ class Farm:
 
     def reset_crop_progress(self):
         self.crop_progress = 0
-        self.crop_planted = ""
+        self.crop_planted = False
         self.crop_ready = math.inf
 
     def reset_worked(self):
@@ -103,6 +99,7 @@ class PlayerData:
                                     0)
         self.farm.reset_worked()
         self.in_town = False
+        self.inventory_cleaner()
 
     def return_from_town(self):
         self.time_of_day = datetime(self.time_of_day.year,
@@ -127,10 +124,15 @@ class PlayerData:
             am = "PM"
         return f"{hour} o'clock {am}"
 
+    # Farming functions
     def harvest(self):
         if self.farm.crop_progress >= self.farm.crop_ready:
             self.farm.reset_crop_progress()
             self.inventory[self.farm.crop_planted] += self.farm.crop_level
+
+    def crop_circle(self):
+        if self.farm.crop_progress >= self.farm.crop_ready:
+            self.farm.reset_crop_progress()
 
     def go_fishing(self):
         if self.farm.worked_today["fishing"]:
@@ -156,6 +158,7 @@ class PlayerData:
         elif "diamond pickaxe" in self.inventory:
             self.inventory["perfect gem"] += 1
 
+    # Merchant functions
     def sell(self, item: str = "", quantity: int = 0) -> bool:
         if self.inventory[item] >= quantity:
             self.inventory[item] -= quantity
@@ -176,6 +179,20 @@ class PlayerData:
             return True
         return False
 
+    def find(self, item: str = "", quantity: int = 0):
+        self.inventory[item] += quantity
+
+    def inventory_getter(self, item: str = ""):
+        return self.inventory.get(item, 0)
+
+    def inventory_cleaner(self):
+        inventory = self.inventory
+        for key in self.inventory:
+            if self.inventory[key] == 0:
+                del inventory[key]
+        self.inventory = inventory
+
+    # alien romance
     def alien_getter(self, alien: str = "") -> int:
         return self.alien_friendship.get(alien, 0)
 
