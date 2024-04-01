@@ -13,6 +13,7 @@ label start:
     fish_store_first_time = True
     plant_store_first_time = True
     gem_store_first_time = True
+    crop_circle = False
 
     lawyer "Ah welcome, please sit."
     $ player_name = renpy.input("I'm glad you could make it Mr... oh, I'm sorry, how would you like to be addressed.")
@@ -120,7 +121,38 @@ label mining:
 
 label gardening:
     pc "Nice day to garden"
-    $pd.farm.set_worked("gardening")
+    if pf.farm.garden_weeds:
+        pc "This garden was way overgrown."
+        pc "There, I've removed the weeds and gotten it ready for planting."
+        $pf.farm.garden_weeds = False
+        $pd.farm.set_worked("gardening")
+        return
+    elif not pf.crop_planted and "wheat seeds" not in pf.inventory:
+        pc "The garden is ready to go, but I'll need some seeds to plant. I should go into town and get some."
+        return
+    elif not pf.crop_planted:
+        $pd.farm.work()
+        $pd.advance_time()
+        pc "There. All planted. I should tend to this on the next few days and see what grows."
+    elif pf.crop_planted:
+        if pd.crop_progress >= crop_ready:
+            pc "Okay, these plants look ready. I can harvest them and collect the crops. Or I can try to communicate with aliens and make a crop circle, but that will ruin the sale value."
+            menu:
+                "Okay, these plants look ready."
+
+                "Harvest them":
+                    $pd.harvest()
+                    $pd.advance_time()
+                    pc "Whew! That was hard work, but it was worth it. I'll put this in the back of the truck for the next time I need it."
+                "Crop circle":
+                    $pd.crop_circle()
+                    $pd.advance_time()
+                    crop_circle = True
+                    pc "Okay... that should do it. If there are any aliens up there, this should get their attention."
+        else:
+            $pd.work()
+            $pd.advance_time()
+            pc "Okay, making progress on these plants. Should be just a little bit more."
     return
 
 label in_town:

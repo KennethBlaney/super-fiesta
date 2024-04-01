@@ -24,29 +24,27 @@ prices = {
     "diamond pickaxe": 40
 }
 
-crop_time = {
-    "wheat": 3,
-    "corn": 3
-}
+crop_time = 3
 
 
 @dataclass
 class Farm:
     crop_level = defaultdict(lambda: 1)
     crop_progress = 0
-    crop_planted = ""
+    crop_planted = False
     crop_ready = math.inf
+    garden_weeds = True
     worked_today = {
         "gardening": False,
         "fishing": False,
         "mining": False
     }
 
-    def work(self, crop: str = ""):
+    def work(self):
         if not self.worked_today["gardening"]:
             if not self.crop_planted:
-                self.crop_planted = crop
-                self.crop_ready = crop_time[crop]
+                self.crop_planted = True
+                self.crop_ready = crop_time
             self.crop_progress += 1
             self.worked_today["gardening"] = True
 
@@ -58,7 +56,7 @@ class Farm:
 
     def reset_crop_progress(self):
         self.crop_progress = 0
-        self.crop_planted = ""
+        self.crop_planted = False
         self.crop_ready = math.inf
 
     def reset_worked(self):
@@ -131,6 +129,10 @@ class PlayerData:
         if self.farm.crop_progress >= self.farm.crop_ready:
             self.farm.reset_crop_progress()
             self.inventory[self.farm.crop_planted] += self.farm.crop_level
+
+    def crop_circle(self):
+        if self.farm.crop_progress >= self.farm.crop_ready:
+            self.farm.reset_crop_progress()
 
     def go_fishing(self):
         if self.farm.worked_today["fishing"]:
