@@ -3,6 +3,7 @@ define lawyer = Character("Lawyer")
 define sal = Character("Sal the Fisher")
 define flora = Character("Flora the Gardener")
 define saph = Character("Sapphire the Gem Collector")
+define alien = Character("Extraterestial Being")
 
 label start:
     $ config.rollback_enabled = False
@@ -16,7 +17,7 @@ label start:
     crop_circle = False
 
     lawyer "Ah welcome, please sit."
-    $ player_name = renpy.input("I'm glad you could make it Mr... oh, I'm sorry, how would you like to be addressed.")
+    $ player_name = renpy.input("I'm glad you could make it Ms... oh, I'm sorry, how would you like to be addressed.")
     pc "My name is [player_name]"
     lawyer "[player_name] it is then."
     lawyer "As we explained in our letter, you, [player_name], have been bequeathed a small parcel of land by our client."
@@ -313,6 +314,122 @@ label gem_store:
                 sal "Good luck and work hard, [player_name]!"
                 return
 
+label aliens:
+    if not crop_circle:
+        pc "Hmm... no aliens tonight. I'll have to figure out a way to signal them with a crop circle."
+        return
+    if pd.alien_friendship['grey'] == 0:
+        "The night stretches on and just when you are about to give up this fantasy that aliens exist, you see it."
+        "A craft about the size of your house lands in the crop circle you've placed in your garden."
+        alien "Greetings human. We saw your signal and were happy to see Earth had finally established intelligent life."
+        pc "We've had intelligent life for a while. Why just now?"
+        alien "Capable, maybe? But intelligent? No. The creation of crop circles is a major step in the advancement of your civilization."
+        pc "Is it?"
+        alien "You have no idea."
+        alien "To further prove that your planet is finally evolved, I will need to run some tests."
+        alien "Please provide me with a fish from the local area so I may run these experiments."
+        alien "Signal me with another crop circle when you are ready."
+        "With that the alien re-enters his ship and flies off."
+        pc "Was it just me, or was that alien really muscular?"
+        pc "Wow... no one is ever going to believe this."
+        $pd.alien_incr()
+        crop_circle = False
+    if pd.alien_friendship['grey'] == 1:
+        "You wait up at night to see if the alien returns. Maybe it was just a dream?"
+        "Soon enough the impressive craft lands once again."
+        alien "You have the agreed upon creature?"
+        if "small fish" in pd.inventory or "medium fish" in pd.inventory or "big fish" in pd.inventory:
+            pc "Yes. Here it is."
+            if "small fish" in pd.inventory:
+                $pd.find('small fish') -= 1
+            elif "medium fish" in pd.inventory:
+                $pd.find('medium fish') -= 1
+            elif "big fish" in pd.inventory:
+                $pd.find('big fish') -= 1
+            alien "Excellent. Now to begin the experiments, I will need a crystal to refract the lasers. Could you provide me with one from the local mine?"
+            pc "Yes, of course."
+            pc "By the way, you can call me [player_name]."
+            alien "It is a pleasure to meet you [player_name]. Thank you for your assistance so far."
+            $pd.alien_incr()
+            crop_circle = False
+        else:
+            pc "No, I haven't been able to catch one yet. I just enjoy your company."
+            alien "The feeling might be mutual human. But please, I need that creature to run my experiments."
+            crop_circle = False
+    if pd.alien_friendship['grey'] == 2:
+        "You await the return of the alien anxiously."
+        "Soon enough the impressive craft lands once again."
+        alien "You have the crystal I need for my experiments?"
+        if "plain gem" in pd.inventory or "nice gem" in pd.inventory or "perfect gem" in pd.inventory:
+            pc "Yes. Here it is."
+            if "plain gem" in pd.inventory:
+                $pd.find('plain gem') -= 1
+            elif "nice gem" in pd.inventory:
+                $pd.find('nice gem') -= 1
+            elif "perfect gem" in pd.inventory:
+                $pd.find('perfect gem') -= 1
+            alien "Excellent. This will do nicely. However, the past creature you provided me proved too small. Could you provide me with a larger sample?"
+            pc "Yes, of course.""
+            alien "Thank you. Your help is vital to my work."
+            $pd.alien_incr()
+            crop_circle = False
+        else:
+            pc "No, I haven't been able to mine one yet. I just enjoy your company."
+            alien "I enjoy your company as well. But please, I need that crystal to run my experiments."
+            crop_circle = False
+    if pd.alien_friendship['grey'] == 3:
+        "You wait up at night to see if the alien returns. Maybe it was just a dream?"
+        "Soon enough the impressive craft lands once again."
+        alien "You have the agreed upon creature?"
+        if "big fish" in pd.inventory:
+            pc "Yes. Here it is."
+            $pd.find('big fish') -= 1
+            alien "Excellent. We are very close to finished."
+            alien "Now I only require a perfectly pure sample of the crystal you provided to me previously."
+            alien "Please provide that and our work together can truly yield results."
+            $pd.alien_incr()
+            crop_circle = False
+        else:
+            pc "No, I haven't been able to catch one yet. I just enjoy your company."
+            alien "I enjoy your company as well. But please, I need that creature so we may continue our work."
+            crop_circle = False
+    if pd.alien_friendship['grey'] == 4:
+        "You wait up at night to see if the alien returns. Maybe it was just a dream?"
+        "Soon enough the impressive craft lands once again."
+        alien "You have the agreed upon creature?"
+        if "perfect gem" in pd.inventory:
+            pc "Yes. Here it is."
+            $pd.find('perfect gem') -= 1
+            alien "Finally. I have all I need. I will begin my work."
+            alien "When you are ready to board my ship so I may show you my results, please summon me again with the crop circle."
+            $pd.alien_incr()
+            crop_circle = False
+        else:
+            pc "No, I haven't been able to find one yet. I just enjoy your company."
+            alien "I enjoy your company as well. But please, we are so close."
+            crop_circle = False
+    if pd.alien_friendship['grey'] == 5:
+        pc "This is crazy. I have summoned your alien friend once again in the hopes of boarding their space craft."
+        pc "No way this is real."
+        "For the last time the huge ship lands in your yard."
+        "The door opens, but the alien doesn't emerge."
+        "Hesitantly, you enter the ship."
+        "As you walk down this long metalic hall way, you arrive at a door."
+        "Sensing your presence, the door slides open with a scifi sound effect revealing... {pause} A ROMANTIC DINNER?"
+        "The alien gestures to your seat."
+        alien "I'm glad you have arrived [player_name]. I was very nervous you wouldn't show up."
+        "Sitting down you see that the candle on the table is, in fact, the crystal you provided from your mine."
+        "The alien places two plates down on the table. They have cooked the fish your provided to perfection."
+        alien "Please... eat."
+        "The two of you eat the prepared meals. The alien herbs and spices are an amazing match."
+        "For the first time, you have a conversation with the alien. The best conversation you've had with another being in months."
+        alien "And now, I have one last element to this night."
+        "The alien gets down on one knee and produces a small felt box. Opening it, it reveals the perfect gem stone you mined for the alien."
+        "The alien says something, but it is all a blur. Before you know it you have agreed to travel the universe with the alien."
+        jump end
+
+
+
 label one_year_later:
     pc "It has been an exciting year, but it is time to leave the farm behind."
     "Thanks for playing this far. I didn't expect any one to and ran out of time in the jam, so there's no real ending here."
@@ -320,4 +437,6 @@ label one_year_later:
     jump end
 
 label end:
+    "Thank you for playing."
+    "The End"
     return
