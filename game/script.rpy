@@ -25,7 +25,7 @@ label start:
     lawyer "You, of course, retain property rights to any fish caught and any gem stones found."
     lawyer "There is also a decent sized garden near the main house. Perfect for a hobbyist who wants to make some money."
     lawyer "The nearby town is full of decent folk and will often have swap meets to buy and sell things."
-    lawyer "Unfortunately, [player_name] part of the stipulation in the will, requires that you must live at the property for one year before you may sell."
+    lawyer "Unfortunately, [player_name], part of the stipulation in the will, requires that you must live at the property for one year before you may sell."
     lawyer "A strange provision for sure, but I've seen stranger. For example..."
     lawyer "My client instructed me to inform you that he believed this location was the meeting place for several forms of extraterrestrial life."
     lawyer "I can't say I fully believe that myself, but I am bound by contract to inform you. You may do with that information as you please."
