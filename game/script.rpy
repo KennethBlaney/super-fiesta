@@ -68,10 +68,9 @@ label sleep_time:
 
         "Stay up and watch for aliens.":
             $pd.well_rested = False
+            call aliens
             $pd.sleep_for_the_night()
-            pc "I'm a little groggy today. No sign of any aliens. Maybe I need to find a way to signal them."
-            pc "I've heard that aliens communicate via crop circles. I could try to make one in my garden."
-            pc "It'll destroy the plants, but it just might work."
+
     return
 
 label daily_routine:
@@ -104,7 +103,8 @@ label daily_routine:
 
             "Drive into town" if pd.time_of_day.hour == 8:
                 $pd.in_town = True
-                jump gone_to_town
+                call gone_to_town
+                return
 
             "Just relax for a few hours":
                 pc "It is nice to just sit and relax for a bit and not feel the need to be constantly productive."
@@ -115,7 +115,7 @@ label gone_to_town:
     pc "I drive into town and talk to the locals"
     call in_town from _call_in_town
     $pd.return_from_town()
-    jump sleep_time
+    return
 
 label fishing:
     scene stream with fade
@@ -347,13 +347,16 @@ label gem_store:
 
 label aliens:
     if not crop_circle:
-        pc "Hmm... no aliens tonight. I'll have to figure out a way to signal them with a crop circle."
+        pc "I'm a little groggy today. No sign of any aliens. Maybe I need to find a way to signal them."
+        pc "I've heard that aliens communicate via crop circles. I could try to make one in my garden."
+        pc "It'll destroy the plants, but it just might work."
         return
     scene black
-    if pd.alien_friendship['grey'] == 0:
+    if pd.alien_getter() == 0:
         "The night stretches on and just when you are about to give up this fantasy that aliens exist, you see it."
         scene ufo_lands with fade
         "A craft about the size of your house lands in the crop circle you've placed in your garden."
+        scene alien with fade
         alien "Greetings human. We saw your signal and were happy to see Earth had finally established intelligent life."
         pc "We've had intelligent life for a while. Why just now?"
         alien "Capable, maybe? But intelligent? No. The creation of crop circles is a major step in the advancement of your civilization."
@@ -367,12 +370,12 @@ label aliens:
         pc "Wow... no one is ever going to believe this."
         $pd.alien_incr()
         $crop_circle = False
-    if pd.alien_friendship['grey'] == 1:
+    elif pd.alien_getter() == 1:
         "You wait up at night to see if the alien returns. Maybe it was just a dream?"
         scene ufo_lands with fade
         "Soon enough the impressive craft lands once again."
         alien "You have the agreed upon creature?"
-        if "small fish" in pd.inventory or "medium fish" in pd.inventory or "big fish" in pd.inventory:
+        if inventory_getter("small fish") or inventory_getter("medium fish") or inventory_getter("big fish"):
             pc "Yes. Here it is."
             if "small fish" in pd.inventory:
                 $pd.find('small fish', -1)
@@ -390,12 +393,12 @@ label aliens:
             pc "No, I haven't been able to catch one yet. I just enjoy your company."
             alien "The feeling might be mutual human. But please, I need that creature to run my experiments."
             $crop_circle = False
-    if pd.alien_friendship['grey'] == 2:
+    elif pd.pd.alien_getter() == 2:
         "You await the return of the alien anxiously."
         scene ufo_lands with fade
         "Soon enough the impressive craft lands once again."
         alien "You have the crystal I need for my experiments?"
-        if "plain gem" in pd.inventory or "nice gem" in pd.inventory or "perfect gem" in pd.inventory:
+        if inventory_getter("plain gem") or inventory_getter("nice gem") or inventory_getter("perfect gem"):
             pc "Yes. Here it is."
             if "plain gem" in pd.inventory:
                 $pd.find('plain gem', -1)
@@ -412,7 +415,7 @@ label aliens:
             pc "No, I haven't been able to mine one yet. I just enjoy your company."
             alien "I enjoy your company as well. But please, I need that crystal to run my experiments."
             $crop_circle = False
-    if pd.alien_friendship['grey'] == 3:
+    elif pd.pd.alien_getter() == 3:
         "You wait up at night to see if the alien returns. Maybe it was just a dream?"
         scene ufo_lands with fade
         "Soon enough the impressive craft lands once again."
@@ -429,7 +432,7 @@ label aliens:
             pc "No, I haven't been able to catch one yet. I just enjoy your company."
             alien "I enjoy your company as well. But please, I need that creature so we may continue our work."
             $crop_circle = False
-    if pd.alien_friendship['grey'] == 4:
+    elif pd.pd.alien_getter() == 4:
         "You wait up at night to see if the alien returns. Maybe it was just a dream?"
         scene ufo_lands with fade
         "Soon enough the impressive craft lands once again."
@@ -445,7 +448,7 @@ label aliens:
             pc "No, I haven't been able to find one yet. I just enjoy your company."
             alien "I enjoy your company as well. But please, we are so close."
             $crop_circle = False
-    if pd.alien_friendship['grey'] == 5:
+    elif pd.pd.alien_getter() == 5:
         pc "This is crazy. I have summoned your alien friend once again in the hopes of boarding their space craft."
         pc "No way this is real."
         scene ufo_lands with fade
@@ -466,6 +469,7 @@ label aliens:
         "The alien gets down on one knee and produces a small felt box. Opening it, it reveals the perfect gem stone you mined for the alien."
         "The alien says something, but it is all a blur. Before you know it you have agreed to travel the universe with the alien."
         jump end
+    return
 
 
 

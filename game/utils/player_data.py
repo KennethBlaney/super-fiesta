@@ -24,7 +24,7 @@ prices = {
     "diamond pickaxe": 40
 }
 
-crop_time = 3
+crop_time = 1
 
 
 @dataclass
@@ -73,7 +73,7 @@ class PlayerData:
     well_rested: bool = True
     in_town: bool = False
     time_of_day = datetime(2024, 5, 1, 8, 0, 0)
-    cash = 0
+    cash = 120
     farm = Farm()
 
     alien_friendship = {
@@ -129,6 +129,8 @@ class PlayerData:
         hour = self.time_of_day.hour
         if hour > 12:
             hour -= 12
+            am = "PM"
+        if hour == 12:
             am = "PM"
         return f"{hour} o'clock {am}"
 
@@ -215,4 +217,4 @@ class PlayerData:
 
     def alien_incr(self, alien: str = "grey"):
         if alien in self.alien_friendship:
-            self.alien_friendship[alien] += 1
+            self.alien_friendship[alien] = self.alien_friendship.get(alien, 0) + 1
