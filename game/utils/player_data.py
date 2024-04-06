@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 values = {
-    "wheat": 10,
+    "wheat": 30,
     "small fish": 5,
     "medium fish": 10,
     "big fish": 15,
@@ -136,7 +136,7 @@ class PlayerData:
 
     def go_fishing(self):
         if self.farm.worked_today["fishing"]:
-            return 0
+            return 4
         else:
             self.farm.worked_today["fishing"] = True
         if "great fishing rod" in self.inventory:
@@ -148,10 +148,11 @@ class PlayerData:
         elif "poor fishing rod" in self.inventory:
             self.inventory["small fish"] += 1
             return 1
+        return 0
 
     def mining(self):
         if self.farm.worked_today["mining"]:
-            return 0
+            return 4
         else:
             self.farm.worked_today["mining"] = True
         if "diamond pickaxe" in self.inventory:
@@ -163,7 +164,7 @@ class PlayerData:
         elif "stone pickaxe" in self.inventory:
             self.inventory["plain gem"] += 1
             return 1
-
+        return 0
 
     # Merchant functions
     def sell(self, item: str = "", quantity: int = 0) -> bool:
@@ -193,7 +194,7 @@ class PlayerData:
         return self.inventory.get(item, 0)
 
     def inventory_cleaner(self):
-        inventory = self.inventory
+        inventory = self.inventory.copy()
         for key in self.inventory:
             if self.inventory[key] == 0:
                 del inventory[key]

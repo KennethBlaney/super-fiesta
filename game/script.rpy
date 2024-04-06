@@ -7,7 +7,7 @@ define alien = Character("Extraterestial Being")
 
 label start:
     $ config.rollback_enabled = False
-    $ from utils import PlayerData
+    $ from utils import PlayerData, values, prices
     $ pd = PlayerData()
     $ ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
     $ town_first_time = True
@@ -47,7 +47,7 @@ label time_loop:
         if pd.time_of_day.year == 2025:
             if pd.time_of_day.month == 5:
                 jump one_year_later
-        if pd.time_of_day.hour >= 20:
+        if pd.time_of_day.hour >= 20 or pd.time_of_day.hour <= 7:
             call sleep_time from _call_sleep_time
 
         # elif special day
@@ -69,14 +69,16 @@ label sleep_time:
         "Stay up and watch for aliens.":
             $pd.well_rested = False
             $pd.sleep_for_the_night()
-            pc "I'm a little groggy today, but I'm glad I kept watch."
+            pc "I'm a little groggy today. No sign of any aliens. Maybe I need to find a way to signal them."
+            pc "I've heard that aliens communicate via crop circles. I could try to make one in my garden."
+            pc "It'll destroy the plants, but it just might work."
     return
 
 label daily_routine:
     scene cottage with fade
     if pd.time_of_day.hour == 8:
         "Always nice to see the farm first thing in the morning. What are we doing?"
-    elif pd.time_of_day.hour <= 12:
+    elif 9 =< pd.time_of_day.hour <= 12:
         "Still have a little time before lunch."
     else:
         "What else can I get done today?"
@@ -104,7 +106,8 @@ label daily_routine:
                 $pd.in_town = True
                 jump gone_to_town
 
-            "Nothing else. I'm done for the day.":
+            "Just relax for a few hours":
+                pc "It is nice to just sit and relax for a bit and not feel the need to be constantly productive."
                 return
 
 label gone_to_town:
@@ -126,6 +129,8 @@ label fishing:
         pc "This is a decent sized fish. I'm sure Sal will be impressed."
     if result == 3:
         pc "An incredible river monster if I do say so myself."
+    if result == 4:
+        pc "I've already caught a fish today. Seems the rest of the fish are scared."
     return
 
 label mining:
@@ -140,10 +145,12 @@ label mining:
         pc "It took some digging, but this one has some heft to it. I should bring it to Sapphire."
     if result == 3:
         pc "This is quite the impressive gem."
+    if result == 4:
+        pc "I've already gone mining today. My arms are still sore."
     return
 
 label gardening:
-    scene cottage with fade
+    # scene cottage with fade
     pc "Nice day to garden"
     if pd.farm.garden_weeds:
         pc "This garden was way overgrown."
@@ -151,33 +158,30 @@ label gardening:
         $pd.farm.garden_weeds = False
         $pd.farm.set_worked("gardening")
         return
-    elif not pd.crop_planted and "wheat seeds" not in pd.inventory:
+    elif not pd.farm.crop_planted and "wheat seeds" not in pd.inventory:
         pc "The garden is ready to go, but I'll need some seeds to plant. I should go into town and get some."
         return
-    elif not pd.crop_planted:
+    elif not pd.farm.crop_planted:
         $pd.farm.work()
-        $pd.advance_time()
         pc "There. All planted. I should tend to this on the next few days and see what grows."
-    elif pd.crop_planted:
-        if pd.crop_progress >= crop_ready:
+        return
+    elif pd.farm.crop_planted:
+        if pd.farm.crop_progress >= pd.farm.crop_ready:
             pc "Okay, these plants look ready. I can harvest them and collect the crops. Or I can try to communicate with aliens and make a crop circle, but that will ruin the sale value."
             menu:
                 "Okay, these plants look ready."
 
                 "Harvest them":
                     $ pd.harvest()
-                    $ pd.advance_time()
                     pc "Whew! That was hard work, but it was worth it. I'll put this in the back of the truck for the next time I need it."
                 "Crop circle":
                     $ pd.crop_circle()
-                    $ pd.advance_time()
                     $ crop_circle = True
                     pc "Okay... that should do it. If there are any aliens up there, this should get their attention."
         else:
-            $pd.work()
-            $pd.advance_time()
+            $pd.farm.work()
             pc "Okay, making progress on these plants. Should be just a little bit more."
-    return
+        return
 
 label in_town:
     if town_first_time:
@@ -231,20 +235,20 @@ label fishing_store:
             sal "Welcome, what can I do for you?"
 
             "sell fish":
-                $fish_value = pd.inventory_getter("small fish")*pd.values["small fish"] + pd.inventory_getter("medium fish")*pd.values["medium fish"] + pd.inventory_getter("big fish")*pd.values["big fish"]
+                $fish_value = pd.inventory_getter("small fish")*values["small fish"] + pd.inventory_getter("medium fish")*values["medium fish"] + pd.inventory_getter("big fish")*values["big fish"]
                 $pd.sell("small fish", pd.inventory_getter("small fish"))
                 $pd.sell("medium fish", pd.inventory_getter("medium fish"))
                 $pd.sell("big fish", pd.inventory_getter("big fish"))
                 sal "Ah, thanks. Here's [fish_value] dollars."
 
-            "buy 'good fishing rod'" if 'good fishing rod' not in pd.inventory:
+            "buy 'good fishing rod' for [prices.get('good fishing rod')]" if 'good fishing rod' not in pd.inventory:
                 $success = pd.buy('good fishing rod', 1)
                 if success:
                     sal "Sold. Glad to see you are getting into the hobby."
                 else:
                     sal "Sorry [player_name]. I don't think you have enough money. Try catching some fish in your stream and selling them to me."
 
-            "buy 'great fishing rod'" if 'great fishing rod' not in pd.inventory:
+            "buy 'great fishing rod' for [prices.get('great fishing rod')]" if 'good fishing rod' in pd.inventory and 'great fishing rod' not in pd.inventory:
                 $success = pd.buy('great fishing rod', 1)
                 if success:
                     sal "Sold. You are quite the master baiter now..."
@@ -277,11 +281,11 @@ label florist:
             flora "Hi [player_name]. What are you looking for today?"
 
             "sell grown food":
-                $food_value = pd.inventory_getter("wheat")*pd.values["wheat"]
+                $food_value = pd.inventory_getter("wheat")*values["wheat"]
                 $pd.sell("wheat", pd.inventory_getter("wheat"))
                 flora "Thank you. This will sell great at the farmer's market. Here's [food_value] dollars."
 
-            "buy more seeds":
+            "buy more seeds for [prices.get('wheat seeds')]":
                 $success = pd.buy('wheat seeds', 1)
                 if success:
                     sal "Here you are. Looking forward to seeing how this crop turns out."
@@ -317,20 +321,20 @@ label gem_store:
             saph "Welcome, to the museum. What can I do for you?"
 
             "sell gems":
-                $gem_value = pd.inventory_getter("plain gem")*pd.values["plain gem"] + pd.inventory_getter("nice gem")*pd.values["nice gem"] + pd.inventory_getter("perfect gem")*pd.values["perfect gem"]
+                $gem_value = pd.inventory_getter("plain gem")*values["plain gem"] + pd.inventory_getter("nice gem")*values["nice gem"] + pd.inventory_getter("perfect gem")*values["perfect gem"]
                 $pd.sell("plain gem", pd.inventory_getter("plain gem"))
                 $pd.sell("nice gem", pd.inventory_getter("nice gem"))
                 $pd.sell("perfect gem", pd.inventory_getter("perfect gem"))
                 saph "Ah, thanks. Here's [gem_value] dollars."
 
-            "buy 'iron pickaxe'" if 'iron pickaxe' not in pd.inventory:
+            "buy 'iron pickaxe' for [prices.get('iron pickaxe')]" if 'iron pickaxe' not in pd.inventory:
                 $success = pd.buy('iron pickaxe', 1)
                 if success:
                     saph "Here you are. I'm looking forward to seeing what you dig up."
                 else:
                     saph "Sorry [player_name]. I don't think you have enough money. Try selling some gems first."
 
-            "buy 'diamond pickaxe'" if 'diamond pickaxe' not in pd.inventory:
+            "buy 'diamond pickaxe' for [prices.get('diamond pickaxe')]" if 'iron pickaxe' in pd.inventory and 'diamond pickaxe' not in pd.inventory:
                 $success = pd.buy('diamond pickaxe', 1)
                 if success:
                     saph "Hmm... I think I have to see your ID to verify your age."
