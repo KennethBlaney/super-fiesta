@@ -91,12 +91,20 @@ class PlayerData:
             self.time_of_day += timedelta(hours=6)
 
     def sleep_for_the_night(self):
-        self.time_of_day = datetime(self.time_of_day.year,
-                                    self.time_of_day.month,
-                                    self.time_of_day.day + 1,
-                                    8,
-                                    0,
-                                    0)
+        if self.time_of_day.hour < 7:
+            self.time_of_day = datetime(self.time_of_day.year,
+                                        self.time_of_day.month,
+                                        self.time_of_day.day,
+                                        8,
+                                        0,
+                                        0)
+        else:
+            self.time_of_day = datetime(self.time_of_day.year,
+                                        self.time_of_day.month,
+                                        self.time_of_day.day + 1,
+                                        8,
+                                        0,
+                                        0)
         self.farm.reset_worked()
         self.in_town = False
         self.inventory_cleaner()
@@ -105,7 +113,7 @@ class PlayerData:
         self.time_of_day = datetime(self.time_of_day.year,
                                     self.time_of_day.month,
                                     self.time_of_day.day,
-                                    10,
+                                    20,
                                     0,
                                     0)
         self.in_town = False
@@ -128,7 +136,8 @@ class PlayerData:
     def harvest(self):
         if self.farm.crop_progress >= self.farm.crop_ready:
             self.farm.reset_crop_progress()
-            self.inventory[self.farm.crop_planted] += self.farm.crop_level
+            self.inventory[self.farm.crop_planted] = (self.inventory[self.farm.crop_planted]
+                                                      + self.farm.crop_level["wheat"])
 
     def crop_circle(self):
         if self.farm.crop_progress >= self.farm.crop_ready:

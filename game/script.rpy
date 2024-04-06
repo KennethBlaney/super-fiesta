@@ -78,7 +78,7 @@ label daily_routine:
     scene cottage with fade
     if pd.time_of_day.hour == 8:
         "Always nice to see the farm first thing in the morning. What are we doing?"
-    elif 9 =< pd.time_of_day.hour <= 12:
+    elif 9 <= pd.time_of_day.hour <= 12:
         "Still have a little time before lunch."
     else:
         "What else can I get done today?"
